@@ -31,7 +31,7 @@ type: ccc
             margin-top: 20px;
         }
 
-        .nav-buttons a button {
+        .nav-buttons button {
             background-color: black;
             color: white;
             border: 1px solid white;
@@ -41,7 +41,7 @@ type: ccc
             font-size: 16px;
         }
 
-        .nav-buttons a button:hover {
+        .nav-buttons button:hover {
             background-color: gray;
         }
 
@@ -72,22 +72,16 @@ type: ccc
             font-size: 18px;
         }
 
-        .form-box textarea {
+        .form-box input[type="text"] {
             width: 100%;
-            height: 150px;
             padding: 10px;
             margin-bottom: 20px;
             background-color: white;
             color: black;
             border: none;
+            font-size: 16px;
         }
 
-        .form-box .output {
-            font-size: 18px;
-            margin-top: 20px;
-        }
-
-        /* Submit Button */
         .submit-btn {
             display: block;
             width: 100%;
@@ -105,6 +99,19 @@ type: ccc
         .submit-btn:hover {
             background-color: gray;
             color: white;
+        }
+
+        .output {
+            font-size: 18px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: white;
+            color: black;
+            border: none;
+            text-align: center;
+            width: 500px; /* Match input box width */
+            box-sizing: border-box;
+            margin: 0 auto; /* Center the output box */
         }
     </style>
 </head>
@@ -126,32 +133,69 @@ type: ccc
         <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_QNA.html"><button>QNA</button></a>
     </div>
 
-    <!-- Main Generator section -->
+    <!-- Main Generator Section -->
     <div class="container">
         <h1 class="section-title">GENERATOR</h1>
 
         <!-- Generator Form -->
         <div class="form-box">
-            <label for="requirements">Generate a hack:</label>
-            <textarea id="requirements" placeholder="Insert requirements for hacks here"></textarea>
-            <!-- Submit Button for the first textarea -->
-            <button class="submit-btn" onclick="submitRequirements()">Submit Requirements</button>
-
-            <label for="output">Output question:</label>
-            <textarea id="output" placeholder="Hack will display here"></textarea>
+            <label for="topicInput">Generate a hack:</label>
+            <input type="text" id="topicInput" required placeholder="Insert topic here">
+            
+            <input type="text" id="requirementsInput" required placeholder="Insert requirements here">
+            
+            <button class="submit-btn" type="button" id="submitButton">Generate</button>
         </div>
+
+        <!-- Output Section -->
+        <h2>Output question:</h2>
+        <div class="output" id="output">Hack will display here</div>
     </div>
 
     <script>
-        function submitRequirements() {
-            alert("Requirements Submitted!");
-            // Logic for handling requirements submission
+        // Function to handle form submission
+        async function submitRequirements() {
+            // Get user input values
+            const topic = document.getElementById('topicInput').value;
+            const requirements = document.getElementById('requirementsInput').value;
+
+            // Prepare the request payload
+            const userRequest = {
+                topic: topic,
+                requirements: requirements
+            };
+
+            try {
+                const response = await fetch('http://localhost:8763/generate/question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userRequest)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+
+                const generatedQuestion = await response.text(); // Adjust based on actual response structure
+                displayQuestion(generatedQuestion); // Call function to display the question
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating the question. Please try again.');
+            }
         }
 
-        function submitOutput() {
-            alert("Output Submitted!");
-            // Logic for handling output submission
+        // Function to display the generated question on the screen
+        function displayQuestion(question) {
+            const outputElement = document.getElementById('output');
+            outputElement.textContent = question; // Set the output to the generated question
         }
+
+        // Ensure the DOM is fully loaded before adding event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('submitButton').addEventListener('click', submitRequirements);
+        });
     </script>
 
 </body>
