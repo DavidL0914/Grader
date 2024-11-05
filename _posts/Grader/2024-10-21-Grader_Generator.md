@@ -115,6 +115,7 @@ type: ccc
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sign out link -->
@@ -128,9 +129,15 @@ type: ccc
 
     <!-- Navigation buttons -->
     <div class="nav-buttons">
-        <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_Home.html"><button>Home</button></a>
-        <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_Grader.html"><button>Grader</button></a>
-        <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_QNA.html"><button>QNA</button></a>
+        <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_Home.html">
+            <button>Home</button>
+        </a>
+        <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_Grader.html">
+            <button>Grader</button>
+        </a>
+        <a href="{{site.baseurl}}/collaboration/2024/10/21/Grader_QNA.html">
+            <button>QNA</button>
+        </a>
     </div>
 
     <!-- Main Generator Section -->
@@ -141,62 +148,58 @@ type: ccc
         <div class="form-box">
             <label for="topicInput">Generate a hack:</label>
             <input type="text" id="topicInput" required placeholder="Insert topic here">
-            
-            <input type="text" id="requirementsInput" required placeholder="Insert requirements here">
-            
+
+            <input type="text" id="requirementsInput" required placeholder="MC, FRQ, or other instructions">
+
             <button class="submit-btn" type="button" id="submitButton">Generate</button>
         </div>
 
         <!-- Output Section -->
         <h2>Output question:</h2>
         <div class="output" id="output">Hack will display here</div>
-    </div>
 
-    <script>
-        // Function to handle form submission
-        async function submitRequirements() {
-            // Get user input values
-            const topic = document.getElementById('topicInput').value;
-            const requirements = document.getElementById('requirementsInput').value;
-
-            // Prepare the request payload
-            const userRequest = {
-                topic: topic,
-                requirements: requirements
-            };
-
-            try {
-                const response = await fetch('http://localhost:8763/generate/question', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(userRequest)
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
+        <script>
+            // Function to handle form submission
+            async function submitRequirements() {
+                // Get user input values
+                const topic = document.getElementById('topicInput').value;
+                const requirements = document.getElementById('requirementsInput').value;
+    
+                // Prepare the request payload
+                const userRequest = {
+                    topic: topic,
+                    requirements: requirements
+                };
+    
+                try {
+                    const response = await fetch('http://localhost:8085/generate/question', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userRequest)
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+    
+                    const generatedQuestion = await response.text(); // Adjust based on actual response structure
+                    displayQuestion(generatedQuestion); // Call function to display the question
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while generating the question. Please try again.');
                 }
-
-                const generatedQuestion = await response.text(); // Adjust based on actual response structure
-                displayQuestion(generatedQuestion); // Call function to display the question
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while generating the question. Please try again.');
             }
-        }
-
-        // Function to display the generated question on the screen
-        function displayQuestion(question) {
-            const outputElement = document.getElementById('output');
-            outputElement.textContent = question; // Set the output to the generated question
-        }
-
-        // Ensure the DOM is fully loaded before adding event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('submitButton').addEventListener('click', submitRequirements);
-        });
-    </script>
-
-</body>
-</html>
+    
+            // Function to display the generated question on the screen
+            function displayQuestion(question) {
+                const outputElement = document.getElementById('output');
+                outputElement.textContent = question; // Set the output to the generated question
+            }
+    
+            // Ensure the DOM is fully loaded before adding event listeners
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('submitButton').addEventListener('click', submitRequirements);
+            });
+        </script>
