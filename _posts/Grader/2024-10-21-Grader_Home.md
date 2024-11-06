@@ -114,11 +114,10 @@ type: ccc
             <button>Sign up</button>
         </div>
     </div>
-    <script>
+        <script>
         document.getElementById("login-button").addEventListener("click", async () => {
             const email = document.getElementById("login-email").value;
             const password = document.getElementById("login-password").value;
-
             const response = await fetch("http://localhost:8085/authenticate", {
                 method: "POST",
                 headers: {
@@ -126,7 +125,6 @@ type: ccc
                 },
                 body: JSON.stringify({ email, password })
             });
-
             if (response.ok) {
                 // Redirect to the assignment page
                 window.location.href = "{{site.baseurl}}/collaboration/2024/10/21/Grader_Assignment.html";

@@ -58,10 +58,16 @@ type: ccc
   </table>
 </div>
 
+<!-- Button to Log Cookie Value -->
+<div>
+  <h3>Log Cookie Value</h3>
+  <button id="logCookieButton">Log Cookie to Console</button>
+</div>
+
 <script type="module">
   const getAllAssignmentsURL = 'http://localhost:8085/api/assignments/get';
   const addAssignmentURL = 'http://localhost:8085/api/assignments/add';
-  const getUserAssignmentsURL = 'http://localhost:8085/api/userassignments/get'; // Correct endpoint for user assignments
+  const getUserAssignmentsURL = 'http://localhost:8085/api/userassignments/get';
 
   const assignmentTable = document.getElementById("assignmentTable");
   const userAssignmentsTable = document.getElementById("userAssignmentsTable");
@@ -69,6 +75,7 @@ type: ccc
   const assignmentNameInput = document.getElementById("assignmentName");
   const useridInput = document.getElementById("userid");
   const fetchButton = document.getElementById("fetchButton");
+  const logCookieButton = document.getElementById("logCookieButton"); // Added button to log cookie
 
   // Function to fetch all assignments
   async function fetchAllAssignments() {
@@ -149,6 +156,27 @@ type: ccc
     }
   }
 
+  // Function to get a cookie value by name
+  function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    console.log(ca);
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i].trim();
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+  // Event listener for logging the cookie to the console
+  logCookieButton.addEventListener("click", () => {
+    const cookieValue = getCookie("jwt_java_spring");
+    console.log("Cookie Value:", cookieValue); // Log the cookie value to the console
+  });
+
   // Function to fetch assignments for a specific user ID
   async function fetchUserAssignments() {
     const userid = useridInput.value;
@@ -159,7 +187,7 @@ type: ccc
     }
 
     try {
-      const response = await fetch(`${getUserAssignmentsURL}/${userid}`, { // Use the correct endpoint
+      const response = await fetch(`${getUserAssignmentsURL}/${userid}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
