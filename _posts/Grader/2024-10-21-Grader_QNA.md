@@ -151,7 +151,7 @@ type: ccc
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-  // prepare HTML defined "result" container for new output
+  // prepare HTML defined "result" container for new outputj
   const resultContainer = document.getElementById("result");
 
   // prepare fetch urls
@@ -269,8 +269,11 @@ type: ccc
             // Create the reply box (hidden by default)
             const replyDiv = returnReplyDiv(data);
             // Add everything to the DOM
-            questionContainer.appendChild(questionDiv);
-            questionContainer.appendChild(replyDiv);
+            const questionsHeader = questionContainer.querySelector("h2");
+            questionsHeader.insertAdjacentElement("afterend", questionDiv);
+            questionDiv.insertAdjacentElement("afterend", replyDiv);
+            // questionContainer.appendChild(questionDiv);
+            // questionContainer.appendChild(replyDiv);
             document.getElementById('question-input').value = "";
          
       })
