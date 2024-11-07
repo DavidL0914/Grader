@@ -58,6 +58,23 @@ type: ccc
   </table>
 </div>
 
+<!-- Section for Adding User Assignment -->
+<div>
+  <h3>Add User Assignment</h3>
+  <form id="addUserAssignmentForm">
+    <label for="userAssignmentUserId">User ID:</label>
+    <input type="number" id="userAssignmentUserId" required>
+
+    <label for="userAssignmentAssignmentId">Assignment ID:</label>
+    <input type="number" id="userAssignmentAssignmentId" required>
+
+    <label for="userAssignmentGrade">Grade:</label>
+    <input type="number" id="userAssignmentGrade" step="0.1" required>
+
+    <button type="submit">Add User Assignment</button>
+  </form>
+</div>
+
 <!-- Button to Log Cookie Value -->
 <div>
   <h3>Log Cookie Value</h3>
@@ -65,17 +82,19 @@ type: ccc
 </div>
 
 <script type="module">
-  const getAllAssignmentsURL = 'http://localhost:8085/api/assignments/get';
-  const addAssignmentURL = 'http://localhost:8085/api/assignments/add';
-  const getUserAssignmentsURL = 'http://localhost:8085/api/userassignments/get';
+  const getAllAssignmentsURL = 'http://localhost:8764/api/assignments/get';
+  const addAssignmentURL = 'http://localhost:8764/api/assignments/add';
+  const getUserAssignmentsURL = 'http://localhost:8764/api/userassignments/get';
+  const addUserAssignmentURL = 'http://localhost:8764/api/userassignments/add';
 
   const assignmentTable = document.getElementById("assignmentTable");
   const userAssignmentsTable = document.getElementById("userAssignmentsTable");
   const addAssignmentForm = document.getElementById("addAssignmentForm");
+  const addUserAssignmentForm = document.getElementById("addUserAssignmentForm");
   const assignmentNameInput = document.getElementById("assignmentName");
   const useridInput = document.getElementById("userid");
   const fetchButton = document.getElementById("fetchButton");
-  const logCookieButton = document.getElementById("logCookieButton"); // Added button to log cookie
+  const logCookieButton = document.getElementById("logCookieButton");
 
   // Function to fetch all assignments
   async function fetchAllAssignments() {
@@ -157,24 +176,30 @@ type: ccc
   }
 
   // Function to get a cookie value by name
-  function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    console.log(ca);
-    for(let i = 0; i <ca.length; i++) {
-      let c = ca[i].trim();
-      if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length);
+  function getCookieValue(cookieName) {
+    const name = cookieName + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(';');
+    console.log(cookieArray);
+
+    for (let cookie of cookieArray) {
+      cookie = cookie.trim();
+      if (cookie.indexOf(name) === 0) {
+        return cookie.substring(name.length, cookie.length);
       }
     }
-    return "";
+    return null;
   }
+
+  // Example usage: Retrieve and print the jwt_java_spring cookie value
+  const jwtJavaSpringValue = getCookieValue("jwt_java_spring");
+  console.log("jwt_java_spring cookie value:", jwtJavaSpringValue);
 
   // Event listener for logging the cookie to the console
   logCookieButton.addEventListener("click", () => {
-    const cookieValue = getCookie("jwt_java_spring");
-    console.log("Cookie Value:", cookieValue); // Log the cookie value to the console
+    const cookieValue = getCookieValue("jwt_java_spring");
+    console.log("jwt_java_spring Cookie Value:", cookieValue); // Log the cookie value to the console
+    alert("Cookie Value: " + (cookieValue || "No cookie found."));
   });
 
   // Function to fetch assignments for a specific user ID
@@ -231,10 +256,50 @@ type: ccc
     });
   }
 
+  // Function to add a new user assignment
+  async function addUserAssignment(event) {
+    event.preventDefault(); // Prevent form submission
+
+    const userid = document.getElementById("userAssignmentUserId").value.trim();
+    const assignmentid = document.getElementById("userAssignmentAssignmentId").value.trim();
+    const grade = document.getElementById("userAssignmentGrade").value.trim();
+
+    if (!userid || !assignmentid || !grade) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    const data = { userid: parseInt(userid), assignmentid: parseInt(assignmentid), grade: parseFloat(grade) };
+
+    try {
+      const response = await fetch(addUserAssignmentURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        console.error(`Failed to add user assignment. Status: ${response.status}`);
+        alert("Failed to add user assignment.");
+        return;
+      }
+
+      alert("User assignment added successfully.");
+      addUserAssignmentForm.reset(); // Clear form fields after successful submission
+      fetchUserAssignments(); // Refresh the list of user assignments
+    } catch (error) {
+      console.error('Error adding user assignment:', error);
+      alert("An error occurred while adding the user assignment.");
+    }
+  }
+
   // Event listeners
   fetchButton.addEventListener("click", fetchUserAssignments);
   addAssignmentForm.addEventListener("submit", addAssignment);
+  addUserAssignmentForm.addEventListener("submit", addUserAssignment);
 
-  // Fetch all assignments on page load
+  // Initial load of all assignments
   fetchAllAssignments();
 </script>

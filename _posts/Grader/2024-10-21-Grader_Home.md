@@ -118,7 +118,7 @@ type: ccc
         document.getElementById("login-button").addEventListener("click", async () => {
             const email = document.getElementById("login-email").value;
             const password = document.getElementById("login-password").value;
-            const response = await fetch("http://localhost:8085/authenticate", {
+            const response = await fetch("http://localhost:8764/authenticate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
