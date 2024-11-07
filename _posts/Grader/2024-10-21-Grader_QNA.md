@@ -156,7 +156,7 @@ type: ccc
 
   // prepare fetch urls
   // const url = `${pythonURI}/api/jokes`;
-  const url = `http://localhost:8085/api/messages`;
+  const url = `http://localhost:8764/api/messages`;
   const getURL = url +"/";
   const likeURL = url + "/message";  // haha reaction
   const jeerURL = url + "/jeer/";  // boohoo reaction
@@ -240,7 +240,7 @@ type: ccc
   // Reaction function to likes or jeers user actions
   function submitMessage() {
     const questionText = document.getElementById('question-input').value;
-    const postURL = `http://localhost:8085/api/messages/message`;
+    const postURL = `http://localhost:8764/api/messages/message`;
     const data = {
                 content: questionText
             };
@@ -292,7 +292,7 @@ type: ccc
         return;
     }
     const questionText = document.getElementById('question-input').value;
-    const postURL = `http://localhost:8085/api/comments/${questionId}`;
+    const postURL = `http://localhost:8764/api/comments/${questionId}`;
     const data = {
                 content: replyText
             };
