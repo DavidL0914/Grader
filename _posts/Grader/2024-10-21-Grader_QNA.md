@@ -179,18 +179,7 @@ type: ccc
       response.json().then(data => {
           console.log(data);
           for (const row of data) {
-                const questionContainer = document.getElementById('questions-container');
-                // Create the new question element
-                const questionDiv = returnQuestionDiv(row);
-                // Create the reply box (hidden by default)
-                const replyDiv = returnReplyDiv(row);
-                // Add everything to the DOM
-                questionContainer.appendChild(questionDiv);
-                questionContainer.appendChild(replyDiv);
-                // Clear input field after submission
-                //document.getElementById('question-input').value = "";
-
-
+              populateQuestion(row);
           }
       })
   })
@@ -198,6 +187,22 @@ type: ccc
   .catch(err => {
     error(err + ": " + getURL);
   });
+
+  function populateQuestion(row){
+        const questionContainer = document.getElementById('questions-container');
+        // Create the new question element
+        const questionDiv = returnQuestionDiv(row);
+        // Create the reply box (hidden by default)
+        const replyDiv = returnReplyDiv(row);
+        // Add everything to the DOM
+        const questionsHeader = questionContainer.querySelector("h2");
+        questionsHeader.insertAdjacentElement("afterend", questionDiv);
+        questionDiv.insertAdjacentElement("afterend", replyDiv);           
+        //questionContainer.appendChild(questionDiv);
+        //questionContainer.appendChild(replyDiv);
+        // Clear input field after submission
+        //document.getElementById('question-input').value = "";
+  }
 
   function returnQuestionDiv(row){
         const questionDiv = document.createElement('div');
@@ -262,20 +267,8 @@ type: ccc
       // valid response will have JSON data
       response.json().then(data => {
           console.log(data);
-            // Likes or Jeers updated/incremented
-            const questionContainer = document.getElementById('questions-container');
-            // Create the new question element
-            const questionDiv = returnQuestionDiv(data);
-            // Create the reply box (hidden by default)
-            const replyDiv = returnReplyDiv(data);
-            // Add everything to the DOM
-            const questionsHeader = questionContainer.querySelector("h2");
-            questionsHeader.insertAdjacentElement("afterend", questionDiv);
-            questionDiv.insertAdjacentElement("afterend", replyDiv);
-            // questionContainer.appendChild(questionDiv);
-            // questionContainer.appendChild(replyDiv);
+            populateQuestion(data);
             document.getElementById('question-input').value = "";
-         
       })
     })
     // catch fetch errors (ie Nginx ACCESS to server blocked)
