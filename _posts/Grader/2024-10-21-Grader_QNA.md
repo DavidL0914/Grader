@@ -325,12 +325,23 @@ type: ccc
         replyDiv.appendChild(replyButton);
 
          for (const comment of row.comments){
+            addCommenttoReplyDiv(replyDiv, comment);
+        }
+        return replyDiv;
+  }
+  function addCommenttoReplyDiv(replyDiv,comment){
+    const replyDivContainer = document.createElement('div');
+            replyDivContainer.classList.add('question');
             const replyDivText = document.createElement('div');
             replyDivText.classList.add('reply-text');
             replyDivText.innerHTML = `<p>${comment.content}</p>`;
-            replyDiv.appendChild(replyDivText);
-        }
-        return replyDiv;
+            const deleteDiv = document.createElement('div');
+            deleteDiv.classList.add('arrow');
+            deleteDiv.innerHTML = '&#x1F5D1;'; // Down arrow symbol
+            deleteDiv.onclick = () => deleteMessageReply(comment.id, replyDivContainer,  replyDiv);
+            replyDivContainer.appendChild(replyDivText);
+            replyDivContainer.appendChild(deleteDiv);
+            replyDiv.appendChild(replyDivContainer);
   }
 
   // Reaction function to likes or jeers user actions
@@ -398,13 +409,40 @@ type: ccc
       // valid response will have JSON data
       response.json().then(data => {
           console.log(data);
-            // Likes or Jeers updated/incremented
-            const replyDivText = document.createElement('div');
-            replyDivText.classList.add('reply-text');
-            replyDivText.innerHTML = `<p>${data.content}</p>`;
-            replyDiv.appendChild(replyDivText);
+                addCommenttoReplyDiv(replyDiv, data);
+            // const replyDivText = document.createElement('div');
+            // replyDivText.classList.add('reply-text');
+            // replyDivText.innerHTML = `<p>${data.content}</p>`;
+            // replyDiv.appendChild(replyDivText);
          
       })
+    })
+    // catch fetch errors (ie Nginx ACCESS to server blocked)
+    .catch(err => {
+      error(err + " " + postURL);
+    });
+  
+  }
+
+  // Reaction function to likes or jeers user actions
+  function deleteMessageReply(commentId, replyTextArea, replyDiv) {
+    const postURL = `http://localhost:8764/api/comments/${commentId}`;
+  // prepare fetch PUT options, clones with JS Spread Operator (...)
+  const postOptions = {...fetchOptions,
+    method: 'DELETE',
+  }; // clones and replaces method
+    // fetch the API
+    fetch(postURL, postOptions)
+    // response is a RESTful "promise" on any successful fetch
+    .then(response => {
+      // check for response errors
+      if (response.status != 200) {
+          error("Delete API response failure: " + response.status)
+          return;  // api failure
+      }
+    
+      replyDiv.removeChild(replyTextArea);
+         
     })
     // catch fetch errors (ie Nginx ACCESS to server blocked)
     .catch(err => {
