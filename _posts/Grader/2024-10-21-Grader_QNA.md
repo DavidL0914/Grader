@@ -362,7 +362,10 @@ type: ccc
     // response is a RESTful "promise" on any successful fetch
     .then(response => {
       // check for response errors
-      if (response.status != 201) {
+      if(response.status == 409){
+        error("Message is similar to previously asked question: " + response.status)
+          return;  // api failure
+      }else if (response.status != 201) {
           error("Post API response failure: " + response.status)
           return;  // api failure
       }
