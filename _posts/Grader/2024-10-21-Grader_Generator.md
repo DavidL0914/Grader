@@ -3,7 +3,6 @@ toc: false
 layout: my own thing
 title: Grader Project
 description: Generate hacks
-courses: { csa: {week: 7}}
 categories: [Collaboration]
 type: ccc
 ---
