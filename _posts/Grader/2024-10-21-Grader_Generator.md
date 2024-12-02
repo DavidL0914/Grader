@@ -186,6 +186,40 @@ type: ccc
         .close-btn:focus {
             color: red;
         }
+
+/* Save Hack and See Saved Hacks Buttons */
+.bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 500px;
+    margin: 20px auto;
+}
+
+.save-btn, .view-saved-btn {
+    background-color: white;
+    color: black;
+    border: 1px solid white;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.save-btn:hover, .view-saved-btn:hover {
+    background-color: gray;
+    color: white;
+}
+
+.save-btn {
+    width: 100px;
+}
+
+.view-saved-btn {
+    width: 200px;
+}
+
     </style>
 </head>
 
@@ -230,12 +264,11 @@ type: ccc
         <h2>Output question:</h2>
         <div class="output" id="output">Hack will display here</div>
 
-        <!-- Save Question Button -->
-        <button class="submit-btn" type="button" onclick="saveQuestion()">Save Question</button>
+<div class="bottom-buttons">
+    <button class="save-btn" onclick="saveQuestion()">Save Hack</button>
+    <button class="view-saved-btn" onclick="toggleModal()">See Saved Hacks</button>
+</div>
 
-        <!-- View Saved Questions -->
-        <h2>Saved Questions</h2>
-        <button class="submit-btn" onclick="toggleModal()">View Saved Questions</button>
 
         <!-- Modal for Saved Questions -->
         <div id="modal" class="modal">
