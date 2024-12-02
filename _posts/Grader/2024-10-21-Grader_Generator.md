@@ -100,62 +100,91 @@ type: ccc
             color: white;
         }
 
-.output {
-    font-size: 15px;
-    margin-top: 10px;
-    padding: 15px;
-    background-color: #333;  /* Gray background for output box */
-    color: white;            /* White text color */
-    border: none;
-    text-align: center;
-    width: 500px;
-    box-sizing: border-box;
-    margin: 0 auto;
-    border-radius: 8px;      /* Optional: Rounded corners */
-}
+        .output {
+            font-size: 15px;
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #333;
+            color: white;
+            border: none;
+            text-align: center;
+            width: 500px;
+            box-sizing: border-box;
+            margin: 0 auto;
+            border-radius: 8px;
+        }
 
-.output p {
-    margin: 0;
-    padding: 5px 0;
-}
+        .output p {
+            margin: 0;
+            padding: 5px 0;
+        }
 
-.output strong {
-    display: block;
-    font-size: 18px;
-    margin-top: 10px;
-}
+        .output strong {
+            display: block;
+            font-size: 18px;
+            margin-top: 10px;
+        }
 
-.output pre {
-    color: #f8f8f2;
-    font-size: 14px;
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    font-family: 'Courier New', monospace;
-    white-space: pre-wrap;
-    overflow-x: auto;
-    margin: 15px 0;
-    text-align: left;
-    background: none;
-}
+        .output pre {
+            color: #f8f8f2;
+            font-size: 14px;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin: 15px 0;
+            text-align: left;
+            background: none;
+        }
 
-.output code {
-    font-size: 15px;
-    color: #f8f8f2;
-    background: none;
-    padding: 0;
-    font-family: 'Courier New', monospace;
-}
+        .output code {
+            font-size: 15px;
+            color: #f8f8f2;
+            background: none;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+        }
 
-.output .keyword { color: #cc99cd; }
-.output .string { color: #f0c674; }
-.output .number { color: #8abeb7; }
+        #dropdown {
+            display: none;
+            position: absolute;
+            background-color: #222;
+            border: 1px solid white;
+            padding: 10px;
+            width: 400px;
+            text-align: left;
+            margin: 0 auto;
+            margin-top: 10px;
+        }
 
+        #saved-questions {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #saved-questions li {
+            padding: 5px;
+            border-bottom: 1px solid gray;
+            cursor: pointer;
+        }
+
+        #saved-questions li:hover {
+            background-color: gray;
+        }
+
+        .small-btn {
+            width: auto;
+            padding: 5px 15px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
 <body>
-
     <!-- Sign out link -->
     <div class="signout">
         <a href="#" style="color: white; text-decoration: none;">Sign out</a>
@@ -196,54 +225,89 @@ type: ccc
         <h2>Output question:</h2>
         <div class="output" id="output">Hack will display here</div>
 
-<script>
-    async function submitRequirements() {
-        const topic = document.getElementById('topicInput').value;
-        const requirements = document.getElementById('requirementsInput').value;
+        <!-- Save Question Button (smaller) -->
+        <button class="submit-btn small-btn" type="button" onclick="saveQuestion()">Save Question</button>
 
-        const userRequest = {
-            topic: topic,
-            requirements: requirements
-        };
+        <!-- Saved Questions -->
+        <h2>Saved Questions</h2>
+        <button class="submit-btn" onclick="toggleDropdown()">View Saved Questions</button>
+        <div id="dropdown">
+            <ul id="saved-questions"></ul>
+        </div>
+    </div>
 
-        try {
-            const response = await fetch('http://localhost:8764/generate/question', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userRequest)
-            });
+    <script>
+        async function submitRequirements() {
+            const topic = document.getElementById('topicInput').value;
+            const requirements = document.getElementById('requirementsInput').value;
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
+            const userRequest = {
+                topic: topic,
+                requirements: requirements
+            };
+
+            try {
+                const response = await fetch('http://localhost:8764/generate/question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userRequest)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+
+                const generatedQuestion = await response.text();
+                displayQuestion(generatedQuestion); // Display raw response
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating the question. Please try again.');
             }
-
-            const generatedQuestion = await response.text();
-            displayQuestion(generatedQuestion); // Display raw response
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while generating the question. Please try again.');
         }
-    }
 
-    // Function to display the generated question in the output box
-function displayQuestion(question) {
-    const outputElement = document.getElementById('output');
+        function displayQuestion(question) {
+            const outputElement = document.getElementById('output');
 
-    // Replace ** with <strong> tags
-    let formattedQuestion = question
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Make text inside ** bold
-        .replace(/(?:\r\n|\r|\n)/g, '<br>')  // Replace newline characters with <br>
-        .replace(/(A\.\s|B\.\s|C\.\s|D\.\s)/g, '<br><strong>$1</strong>') // Bold options for multiple choice
-        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>'); // Wrap code blocks with <pre><code>
+            let formattedQuestion = question
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/(?:\r\n|\r|\n)/g, '<br>')
+                .replace(/(A\.\s|B\.\s|C\.\s|D\.\s)/g, '<br><strong>$1</strong>')
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
 
-    outputElement.innerHTML = formattedQuestion;
-}
+            outputElement.innerHTML = formattedQuestion;
+        }
 
+        const savedQuestions = [];
 
+        function saveQuestion() {
+            const question = document.getElementById('output').innerHTML;
+            if (question) {
+                savedQuestions.push(question);
+                alert("Question saved!");
+            } else {
+                alert("No question to save!");
+            }
+        }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('submitButton').addEventListener('click', submitRequirements);
-    });
-</script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+
+            // Populate saved questions
+            const list = document.getElementById('saved-questions');
+            list.innerHTML = '';
+            savedQuestions.forEach((question, index) => {
+                const item = document.createElement('li');
+                item.textContent = `Question ${index + 1}`;
+                item.onclick = () => alert(question);
+                list.appendChild(item);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('submitButton').addEventListener('click', submitRequirements);
+        });
+    </script>
+</body> 
