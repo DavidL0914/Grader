@@ -146,39 +146,45 @@ type: ccc
             font-family: 'Courier New', monospace;
         }
 
-        #dropdown {
+        /* Modal Styling */
+        .modal {
             display: none;
-            position: absolute;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
             background-color: #222;
-            border: 1px solid white;
-            padding: 10px;
-            width: 400px;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            color: white;
+            border-radius: 10px;
             text-align: left;
-            margin: 0 auto;
-            margin-top: 10px;
         }
 
-        #saved-questions {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .modal-content h3 {
+            margin-top: 0;
         }
 
-        #saved-questions li {
-            padding: 5px;
-            border-bottom: 1px solid gray;
+        .close-btn {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
         }
 
-        #saved-questions li:hover {
-            background-color: gray;
-        }
-
-        .small-btn {
-            width: auto;
-            padding: 5px 15px;
-            font-size: 12px;
-            margin-top: 10px;
+        .close-btn:hover,
+        .close-btn:focus {
+            color: red;
         }
     </style>
 </head>
@@ -224,33 +230,36 @@ type: ccc
         <h2>Output question:</h2>
         <div class="output" id="output">Hack will display here</div>
 
-        <!-- Save Question Button (smaller) -->
-        <button class="submit-btn small-btn" type="button" onclick="saveQuestion()">Save Question</button>
+        <!-- Save Question Button -->
+        <button class="submit-btn" type="button" onclick="saveQuestion()">Save Question</button>
 
-        <!-- Saved Questions -->
+        <!-- View Saved Questions -->
         <h2>Saved Questions</h2>
-        <button class="submit-btn" onclick="toggleDropdown()">View Saved Questions</button>
-        <div id="dropdown">
-            <ul id="saved-questions"></ul>
+        <button class="submit-btn" onclick="toggleModal()">View Saved Questions</button>
+
+        <!-- Modal for Saved Questions -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h3>Saved Questions</h3>
+                <ul id="saved-questions" style="list-style: none; padding: 0;"></ul>
+            </div>
         </div>
     </div>
 
     <script>
+        const savedQuestions = [];
+
         async function submitRequirements() {
             const topic = document.getElementById('topicInput').value;
             const requirements = document.getElementById('requirementsInput').value;
 
-            const userRequest = {
-                topic: topic,
-                requirements: requirements
-            };
+            const userRequest = { topic, requirements };
 
             try {
                 const response = await fetch('http://localhost:8764/generate/question', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userRequest)
                 });
 
@@ -259,7 +268,7 @@ type: ccc
                 }
 
                 const generatedQuestion = await response.text();
-                displayQuestion(generatedQuestion); // Display raw response
+                displayQuestion(generatedQuestion);
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while generating the question. Please try again.');
@@ -268,45 +277,42 @@ type: ccc
 
         function displayQuestion(question) {
             const outputElement = document.getElementById('output');
-
-            let formattedQuestion = question
+            const formattedQuestion = question
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/(?:\r\n|\r|\n)/g, '<br>')
                 .replace(/(A\.\s|B\.\s|C\.\s|D\.\s)/g, '<br><strong>$1</strong>')
                 .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-
             outputElement.innerHTML = formattedQuestion;
         }
-
-        const savedQuestions = [];
 
         function saveQuestion() {
             const question = document.getElementById('output').innerHTML;
             if (question) {
                 savedQuestions.push(question);
-                alert("Question saved!");
+                alert('Question saved!');
             } else {
-                alert("No question to save!");
+                alert('No question to save!');
             }
         }
 
-        function toggleDropdown() {
-            const dropdown = document.getElementById('dropdown');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        function toggleModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'block';
 
-            // Populate saved questions
             const list = document.getElementById('saved-questions');
             list.innerHTML = '';
             savedQuestions.forEach((question, index) => {
                 const item = document.createElement('li');
-                item.textContent = `Question ${index + 1}`;
-                item.onclick = () => alert(question);
+                item.innerHTML = `<strong>Question ${index + 1}</strong>: <br>${question}`;
+                item.style.marginBottom = '10px';
                 list.appendChild(item);
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('submitButton').addEventListener('click', submitRequirements);
-        });
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        document.getElementById('submitButton').addEventListener('click', submitRequirements);
     </script>
-</body> 
+</body>
