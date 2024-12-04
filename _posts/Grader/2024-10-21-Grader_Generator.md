@@ -234,7 +234,7 @@ type: ccc
       <div id="modal" class="modal">
          <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3>Saved Questions</h3>
+            <h2>Saved Questions</h2>
             <ul id="saved-questions" style="list-style: none; padding: 0;"></ul>
          </div>
       </div>
@@ -292,14 +292,16 @@ type: ccc
           const modal = document.getElementById('modal');
           modal.style.display = 'block';
       
-          const list = document.getElementById('saved-questions');
-          list.innerHTML = '';
-          savedQuestions.forEach((question, index) => {
-              const item = document.createElement('li');
-              item.innerHTML = `<strong>Question ${index + 1}</strong>: <br>${question}`;
-              item.style.marginBottom = '10px';
-              list.appendChild(item);
-          });
+        const list = document.getElementById('saved-questions');
+        list.innerHTML = '';
+        savedQuestions.forEach((question, index) => {
+            const item = document.createElement('li');
+            item.innerHTML = `
+                <span style="font-size: 1.2em;"><strong><u>Question ${index + 1}</u></strong></span>: 
+                <br><span style="font-size: 1.0em;">${question}</span>`;
+            item.style.marginBottom = '10px';
+            list.appendChild(item);
+        });
       }
       
       function closeModal() {
