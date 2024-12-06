@@ -191,6 +191,16 @@ type: ccc
       .view-saved-btn {
       width: 200px;
       }
+      /* Saved Questions Styling */
+      #saved-questions li {
+      margin-bottom: 20px;
+      }
+      #saved-questions li strong {
+      font-size: 18px;
+      text-decoration: underline;
+      margin-bottom: 10px;
+      display: block;
+      }
    </style>
 </head>
 <body>
@@ -278,35 +288,73 @@ type: ccc
           outputElement.innerHTML = formattedQuestion;
       }
       
-      function saveQuestion() {
+      async function saveQuestion() {
           const question = document.getElementById('output').innerHTML;
           if (question) {
-              savedQuestions.push(question);
-              alert('Question saved!');
+              const questionData = { question };
+              try {
+                  const response = await fetch('http://localhost:8764/save-question', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(questionData)
+                  });
+      
+                  if (response.ok) {
+                      alert('Question saved to database!');
+                  } else {
+                      alert('Failed to save question. Please try again.');
+                  }
+              } catch (error) {
+                  console.error('Error saving question:', error);
+                  alert('An error occurred while saving the question.');
+              }
           } else {
               alert('No question to save!');
           }
       }
       
-      function toggleModal() {
-          const modal = document.getElementById('modal');
-          modal.style.display = 'block';
-      
-        const list = document.getElementById('saved-questions');
-        list.innerHTML = '';
-        savedQuestions.forEach((question, index) => {
-            const item = document.createElement('li');
-            item.innerHTML = `
-                <span style="font-size: 1.2em;"><strong><u>Question ${index + 1}</u></strong></span>: 
-                <br><span style="font-size: 1.0em;">${question}</span>`;
-            item.style.marginBottom = '10px';
-            list.appendChild(item);
-        });
-      }
+function toggleModal() {
+    const modal = document.getElementById('modal');
+    modal.style.display = 'block';
+    
+    // Fetch and display saved questions
+    loadSavedQuestions();
+}
+
       
       function closeModal() {
           document.getElementById('modal').style.display = 'none';
       }
+      
+async function loadSavedQuestions() {
+    const list = document.getElementById('saved-questions');
+    list.innerHTML = ''; // Clear existing list
+
+    try {
+        const response = await fetch('http://localhost:8764/saved-questions');
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const questions = await response.json(); // Ensure the response is parsed as JSON
+
+        if (!Array.isArray(questions)) {
+            throw new Error('Response is not an array');
+        }
+
+        // Populate the modal with the saved questions
+        questions.forEach((question, index) => {
+            const item = document.createElement('li');
+            item.innerHTML = `<strong>Question ${index + 1}:</strong><br>${question}`;
+            list.appendChild(item);
+        });
+    } catch (error) {
+        console.error('Error loading saved questions:', error);
+        alert('Error loading saved questions: ' + error.message);
+    }
+}
+
       
       document.getElementById('submitButton').addEventListener('click', submitRequirements);
    </script>
