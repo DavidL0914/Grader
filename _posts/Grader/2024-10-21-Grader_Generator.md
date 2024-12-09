@@ -1,10 +1,8 @@
 ---
 toc: false
-layout: my own thing
+layout: pos
 title: Grader Project
-description: Generate hacks
-categories: [Collaboration]
-type: ccc
+permalink: /generator
 ---
 <head>
    <meta charset="UTF-8">
@@ -260,7 +258,7 @@ type: ccc
           const userRequest = { topic, requirements };
       
           try {
-              const response = await fetch('http://localhost:8764/generate/question', {
+              const response = await fetch('http://localhost:8082/generate/question', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify(userRequest)
@@ -293,7 +291,7 @@ type: ccc
           if (question) {
               const questionData = { question };
               try {
-                  const response = await fetch('http://localhost:8764/save-question', {
+                  const response = await fetch('http://localhost:8082/save-question', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(questionData)
@@ -331,7 +329,7 @@ async function loadSavedQuestions() {
     list.innerHTML = ''; // Clear existing list
 
     try {
-        const response = await fetch('http://localhost:8764/saved-questions');
+        const response = await fetch('http://localhost:8082/saved-questions');
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
